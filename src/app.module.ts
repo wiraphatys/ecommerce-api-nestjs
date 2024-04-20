@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule, ValidationPipe } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
@@ -40,6 +40,7 @@ export class AppModule implements NestModule {
         .apply(Authenticated)
         .forRoutes(
           // enter the route that we want to apply middleware on
+          { path: "users/address", method: RequestMethod.POST }
         )
         .apply(Authenticated, AuthorizeAdmin)           // authorize: admin
         .forRoutes(
