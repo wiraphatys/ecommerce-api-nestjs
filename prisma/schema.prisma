@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id       Int      @id @default(autoincrement())
+  name     String   @unique
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+  users    User[]
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  fname    String
+  lname    String
+  email    String   @unique
+  username String   @unique
+  password String
+  tel      String
+  role     Role     @relation(fields: [roleId], references: [id])
+  roleId   Int
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+  address  Address?
+  orders   Order[]
+}
+
+model Address {
+  userId      Int      @id @unique
+  user        User     @relation(fields: [userId], references: [id])
+  houseNumber String
+  street      String
+  district    String
+  city        String
+  postalCode  String
+  createAt    DateTime @default(now())
+  updateAt    DateTime @updatedAt
+}
+
+model Product {
+  id         Int             @id @default(autoincrement())
+  name       String
+  unitPrice  Float
+  cost       Float
+  quantity   Int
+  categoryId Int
+  category   ProductCategory @relation(fields: [categoryId], references: [id])
+  createAt   DateTime        @default(now())
+  updateAt   DateTime        @updatedAt
+  orderLines OrderLine[]
+}
+
+model ProductCategory {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  createAt DateTime  @default(now())
+  updateAt DateTime  @updatedAt
+  products Product[]
+}
+
+model Order {
+  id         String      @id
+  userId     Int
+  user       User        @relation(fields: [userId], references: [id])
+  createAt   DateTime    @default(now())
+  updateAt   DateTime    @updatedAt
+  orderLines OrderLine[]
+  payment    Payment?
+}
+
+// handle many-to-many: order <-> product
+model OrderLine {
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  createAt  DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  @@id([orderId, productId])
+}
+
+model Payment {
+  orderId       String   @unique
+  order         Order    @relation(fields: [orderId], references: [id])
+  paymentIntent String // payment id created by stripe
+  amount        Float
+  currency      String // (e.g. USD, THB)
+  status        String // (e.g. succeeded, pending)
+  createAt      DateTime @default(now())
+  updateAt      DateTime @updatedAt
+}
