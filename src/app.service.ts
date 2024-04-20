@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 export class AppService {
   healthcheck(): Object {
     return {
-      server: "nest-prisma",
+      server: "ecommerce-api-nestjs",
       version: "1.0.0",
     }
   }

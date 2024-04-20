@@ -8,15 +8,25 @@ import { OrdersModule } from './orders/orders.module';
 import { AuthModule } from './auth/auth.module';
 import { Authenticated } from './middleware/authenticated';
 import { APP_PIPE } from '@nestjs/core';
-import { Authorize } from './middleware/authorize';
+import { AuthorizeAdmin } from './middleware/authorizeAdmin';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [DatabaseModule, UsersModule, ProductsModule, OrdersModule, AuthModule],
+  imports: [ConfigModule.forRoot(), DatabaseModule, UsersModule, ProductsModule, OrdersModule, AuthModule,
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_SECRET,
+      signOptions: {
+        expiresIn: process.env.JWT_EXPIRE
+      }
+    })
+  ],
   controllers: [AppController],
   providers: [
     AppService,
     Authenticated,
-    Authorize,
+    AuthorizeAdmin, 
     {
       provide: APP_PIPE,
       useClass: ValidationPipe
@@ -31,7 +41,7 @@ export class AppModule implements NestModule {
         .forRoutes(
           // enter the route that we want to apply middleware on
         )
-        .apply(Authenticated, () => new Authorize([1]))           // authorize: admin
+        .apply(Authenticated, AuthorizeAdmin)           // authorize: admin
         .forRoutes(
           // enter the route that we want to apply middleware on
         )
