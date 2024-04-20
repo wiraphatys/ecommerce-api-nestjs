@@ -40,7 +40,8 @@ export class AppModule implements NestModule {
         .apply(Authenticated)
         .forRoutes(
           // enter the route that we want to apply middleware on
-          { path: "users/address", method: RequestMethod.POST }
+          { path: "users/address", method: RequestMethod.POST },
+          { path: "users/me", method: RequestMethod.GET }
         )
         .apply(Authenticated, AuthorizeAdmin)           // authorize: admin
         .forRoutes(

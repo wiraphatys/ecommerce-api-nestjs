@@ -50,6 +50,25 @@ export class UsersController {
     }
   }
 
+  @Get('me')
+  async getProfile(
+    @Req() req: Request,
+    @Res() res: Response
+  ) {
+    const { user, err } = await this.usersService.getProfile(req['user'].id)
+    if (err !== null) {
+      return res.status(400).json({
+        success: false,
+        message: err
+      })
+    } else {
+      return res.status(200).json({
+        success: true,
+        data: user
+      })
+    }
+  }
+
   @Get()
   findAll() {
     return this.usersService.findAll();

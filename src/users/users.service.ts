@@ -67,6 +67,38 @@ export class UsersService {
     }
   }
 
+  async getProfile(userId: number): Promise<{user: User, err: string}> {
+    try {
+      const user = await this.databaseService.user.findUnique({
+        where: {
+          id: userId
+        },
+        include: {
+          address: true
+        }
+      })
+      if (!user) {
+        return {
+          user: null,
+          err: "not found this user"
+        }
+      }
+
+      delete user.password
+
+      return {
+        user,
+        err: null
+      }
+    } catch (err) {
+      console.log(err)
+      return {
+        user: null,
+        err: err
+      }
+    }
+  }
+
   findAll() {
     return `This action returns all users`;
   }
