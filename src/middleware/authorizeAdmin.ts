@@ -6,7 +6,7 @@ export class AuthorizeAdmin implements NestMiddleware {
     constructor() { }
 
     use(req: Request, res: Response, next: NextFunction) {
-        if (req['user'].role !== 0) {
+        if (req['user'].role !== 1) {
             return res.status(403).json({
                 success: false,
                 message: `User role ${req['user'].role} is not authorized to access this route`
