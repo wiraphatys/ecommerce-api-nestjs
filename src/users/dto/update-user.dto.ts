@@ -25,7 +25,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
     @IsPhoneNumber('TH')
     @IsOptional()
-    readonly tel: string
+    readonly tel?: string
 
     @IsNumber()
     @IsEmpty()
