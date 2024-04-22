@@ -5,6 +5,7 @@ import { DatabaseService } from 'src/database/database.service';
 import { Address, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt'
 import { AddressDto } from './dto/address.dto';
+import { Request } from 'express';
 
 
 @Injectable()
@@ -22,6 +23,7 @@ export class UsersService {
       const user = await this.databaseService.user.create({
         data: createUserDto
       })
+      delete user.password
 
       return {
         user: user,
@@ -122,8 +124,73 @@ export class UsersService {
     }
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async updateUserById(id: number, updateUserDto: UpdateUserDto, req: Request): Promise<{user: User, err: string}> {
+    try {
+      // check existed user
+      const existed = await this.databaseService.user.findUnique({
+        where: {
+          id: id
+        }
+      })
+
+      // role: admin
+      if (req['user'].roleId === 1) {
+        if (!existed) {
+          return {
+            user: null,
+            err: "not found this user"
+          }
+        }
+
+        if (updateUserDto.password)
+          updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10)
+
+        const user = await this.databaseService.user.update({
+          where: {
+            id
+          },
+          data: updateUserDto
+        })
+        delete user.password;
+
+        return {
+          user,
+          err: null
+        }
+      } 
+      // role: customer
+      else if (req['user'].roleId === 2) {
+        // ownership validation
+        if (req['user'].id === existed.id && existed) {
+          if (updateUserDto.password)
+            updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10)
+
+          const user = await this.databaseService.user.update({
+            where: {
+              id
+            },
+            data: updateUserDto
+          })
+          delete user.password;
+          
+          return {
+            user,
+            err: null
+          }
+        } else {
+          return {
+            user: null,
+            err: "you are not authorized to access this user"
+          }
+        }
+      }
+    } catch (err) {
+      console.log("Error: ", err)
+      return {
+        user: null,
+        err: err.message
+      }
+    }
   }
 
   remove(id: number) {

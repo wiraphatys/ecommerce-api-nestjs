@@ -95,8 +95,34 @@ export class UsersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  async updateUserById(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Param('id') id: string, 
+    @Body() updateUserDto: UpdateUserDto
+  ) {
+    const { user, err } = await this.usersService.updateUserById(+id, updateUserDto, req);
+    if (err !== null) {
+      let statusCode: number;
+      switch (err) {
+        case "not found this user":
+          statusCode = 404;
+        case "you are not authorized to access this user":
+          statusCode = 401;
+        default:
+          statusCode = 500;
+      }
+
+      return res.status(statusCode).json({
+        success: false,
+        message: err
+      })
+    } else {
+      return res.status(200).json({
+        success: true,
+        data: user
+      })
+    }
   }
 
   @Delete(':id')
