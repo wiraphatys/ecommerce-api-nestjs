@@ -10,7 +10,10 @@ export class Authenticated implements NestMiddleware {
         const token = req.cookies['access_token'];
 
         if (!token) {
-            return res.status(401).json({ message: 'Unauthorized' });
+            return res.status(401).json({ 
+                success: false,
+                message: 'Unauthorized' 
+            });
         }
 
         try {
@@ -18,7 +21,10 @@ export class Authenticated implements NestMiddleware {
             req['user'] = decoded;
             next();
         } catch (err) {
-            return res.status(401).json({ message: 'Unauthorized' });
+            return res.status(401).json({
+                success: false,
+                message: 'Unauthorized'
+            });
         }
     }
 }
