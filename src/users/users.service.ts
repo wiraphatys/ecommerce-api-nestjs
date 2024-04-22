@@ -12,7 +12,7 @@ export class UsersService {
   constructor(
     private readonly databaseService: DatabaseService,
   ) { }
-  async createUser(createUserDto: CreateUserDto): Promise<{user: User, err: string}> {
+  async createUser(createUserDto: CreateUserDto): Promise<{ user: User, err: string }> {
     try {
       // hashing password
       const hashedPassword: string = await bcrypt.hash(createUserDto.password, 10)
@@ -42,7 +42,7 @@ export class UsersService {
     }
   }
 
-  async addAddress(addressDto: AddressDto): Promise<{address: Address, err: string}> {
+  async addAddress(addressDto: AddressDto): Promise<{ address: Address, err: string }> {
     try {
       const address = await this.databaseService.address.create({
         data: addressDto
@@ -67,7 +67,7 @@ export class UsersService {
     }
   }
 
-  async getProfile(userId: number): Promise<{user: User, err: string}> {
+  async getProfile(userId: number): Promise<{ user: User, err: string }> {
     try {
       const user = await this.databaseService.user.findUnique({
         where: {
@@ -99,12 +99,27 @@ export class UsersService {
     }
   }
 
-  findAll() {
-    return `This action returns all users`;
-  }
+  async findAll(): Promise<{ users: User[], err: string }> {
+    try {
+      const users = await this.databaseService.user.findMany();
+      if (!users) {
+        return {
+          users: null,
+          err: "not found any user"
+        }
+      }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+      return {
+        users,
+        err: null
+      }
+    } catch (err) {
+      console.log("Error: ", err);
+      return {
+        users: null,
+        err: err
+      }
+    }
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

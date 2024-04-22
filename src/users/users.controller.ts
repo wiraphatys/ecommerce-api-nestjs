@@ -7,7 +7,7 @@ import { AddressDto } from './dto/address.dto';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Post('register')
   async createUser(
@@ -70,13 +70,28 @@ export class UsersController {
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  async findAll(@Res() res: Response) {
+    const { users, err } = await this.usersService.findAll();
+    if (err !== null) {
+      switch (err) {
+        case "not found any user":
+          return res.status(404).json({
+            success: false,
+            message: err,
+            data: []
+          })
+        default:
+          return res.status(500).json({
+            success: false,
+            message: err,
+          })
+      }
+    } else {
+      return res.status(200).json({
+        success: true,
+        data: users
+      })
+    }
   }
 
   @Patch(':id')
