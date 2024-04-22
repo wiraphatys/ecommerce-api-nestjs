@@ -26,7 +26,7 @@ import { ConfigModule } from '@nestjs/config';
   providers: [
     AppService,
     Authenticated,
-    AuthorizeAdmin, 
+    AuthorizeAdmin,
     {
       provide: APP_PIPE,
       useClass: ValidationPipe
@@ -42,7 +42,7 @@ export class AppModule implements NestModule {
           { path: "users/address", method: RequestMethod.POST },
           { path: "users/me", method: RequestMethod.GET }
         )
-        .apply(Authenticated)
+        .apply(Authenticated, AuthorizeAdmin)
         .forRoutes(
           // enter the route that we want to apply middleware on
           { path: "users", method: RequestMethod.GET }
