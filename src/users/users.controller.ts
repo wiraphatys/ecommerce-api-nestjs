@@ -89,6 +89,7 @@ export class UsersController {
     } else {
       return res.status(200).json({
         success: true,
+        amount: users.length,
         data: users
       })
     }
