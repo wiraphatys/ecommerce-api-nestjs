@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Request, Response } from 'express';
 import { AddressDto } from './dto/address.dto';
+import { UpdateAddressDto } from './dto/update-address.dto';
 
 @Controller('users')
 export class UsersController {
@@ -152,6 +153,38 @@ export class UsersController {
       return res.status(200).json({
         success: true,
         data: {}
+      })
+    }
+  }
+
+  @Patch('address/:id')
+  async updateAddressById(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Param('id') id: string,
+    @Body() updateAddressDto: UpdateAddressDto
+  ) {
+    updateAddressDto.userId = parseInt(id)
+    const { address, err } = await this.usersService.updateAddressById(+id, updateAddressDto, req)
+    if (err !== null) {
+      let statusCode: number;
+      switch (err) {
+        case "not found this address" || "you have never added your address before, add now !":
+          statusCode = 404;
+        case "you are not authorized to access this address":
+          statusCode = 401;
+        default:
+          statusCode = 500;
+      }
+
+      return res.status(statusCode).json({
+        success: false,
+        message: err
+      })
+    } else {
+      return res.status(200).json({
+        success: true,
+        data: address
       })
     }
   }

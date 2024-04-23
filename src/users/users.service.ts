@@ -6,6 +6,7 @@ import { Address, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt'
 import { AddressDto } from './dto/address.dto';
 import { Request } from 'express';
+import { UpdateAddressDto } from './dto/update-address.dto';
 
 
 @Injectable()
@@ -124,7 +125,7 @@ export class UsersService {
     }
   }
 
-  async updateUserById(id: number, updateUserDto: UpdateUserDto, req: Request): Promise<{user: User, err: string}> {
+  async updateUserById(id: number, updateUserDto: UpdateUserDto, req: Request): Promise<{ user: User, err: string }> {
     try {
       // check existed user
       const existed = await this.databaseService.user.findUnique({
@@ -157,7 +158,7 @@ export class UsersService {
           user,
           err: null
         }
-      } 
+      }
       // role: user
       else if (req['user'].roleId === 2) {
         // ownership validation
@@ -172,7 +173,7 @@ export class UsersService {
             data: updateUserDto
           })
           delete user.password;
-          
+
           return {
             user,
             err: null
@@ -193,7 +194,7 @@ export class UsersService {
     }
   }
 
-  async deleteUserById(id: number, req: Request): Promise<{err: string}> {
+  async deleteUserById(id: number, req: Request): Promise<{ err: string }> {
     try {
       const existed = await this.databaseService.user.findUnique({
         where: {
@@ -214,12 +215,12 @@ export class UsersService {
             id
           }
         })
-        
+
         return {
           err: null
         }
 
-      } 
+      }
       // role: user
       else if (req['user'].roleId === 2) {
         // ownership validation
@@ -242,6 +243,73 @@ export class UsersService {
     } catch (err) {
       console.log("Error: ", err)
       return {
+        err: err.message
+      }
+    }
+  }
+
+  async updateAddressById(id: number, updateAddressDto: UpdateAddressDto, req: Request): Promise<{ address: Address, err: string }> {
+    try {
+      const existed = await this.databaseService.user.findUnique({
+        where: {
+          id
+        }
+      })
+
+      // role: admin
+      if (req['user'].roleId === 1) {
+        if (!existed) {
+          return {
+            address: null,
+            err: "not found this address"
+          }
+        }
+
+        const address = await this.databaseService.address.update({
+          where: {
+            userId: id
+          },
+          data: updateAddressDto
+        })
+
+        return {
+          address,
+          err: null
+        }
+      }
+      // role: user
+      else if (req['user'].roleId === 2) {
+        // ownership validation
+        if (req['user'].id === id) {
+          if (!existed) {
+            return {
+              address: null,
+              err: "you have never added your address before, add now !"
+            }
+          }
+
+          const address = await this.databaseService.address.update({
+            where: {
+              userId: id
+            },
+            data: updateAddressDto
+          })
+
+          return {
+            address,
+            err: null
+          }
+        } else {
+          return {
+            address: null,
+            err: "you are not authorized to access this address"
+          }
+        }
+      }
+    } catch (err) {
+      console.log("Error: ", err)
+      return {
+        address: null,
         err: err.message
       }
     }
