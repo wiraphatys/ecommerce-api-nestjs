@@ -1,6 +1,11 @@
 version: '3.8'
 
+networks:
+  default:
+    driver: bridge
+
 services:
+
   postgres:
     image: postgres:latest
     container_name: postgres
@@ -13,6 +18,8 @@ services:
     ports:
       - "5432:5432"
     restart: unless-stopped
+    networks:
+      - default
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -25,6 +32,24 @@ services:
     depends_on:
       - postgres
     restart: unless-stopped
+    networks:
+      - default
+
+  node-server-nestjs:
+    container_name: node-server-nestjs
+    image: node-server-nestjs
+    command: npm run start:prod
+    environment:
+      DATABASE_URL: "postgresql://root:123456@postgres:5432/ecommerce-db?schema=public"
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/user/src/app
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - default
 
 volumes:
   postgres_data:

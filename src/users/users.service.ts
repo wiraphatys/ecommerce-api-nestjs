@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DatabaseService } from 'src/database/database.service';
 import { Address, User } from '@prisma/client';
-import * as bcrypt from 'bcrypt'
+import * as bcrypt from 'bcryptjs'
 import { AddressDto } from './dto/address.dto';
 import { Request } from 'express';
 import { UpdateAddressDto } from './dto/update-address.dto';
