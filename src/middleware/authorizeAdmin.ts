@@ -8,7 +8,7 @@ export class AuthorizeAdmin implements NestMiddleware {
         if (req['user'].roleId !== 1) {
             return res.status(403).json({
                 success: false,
-                message: `User role ${req['user'].role} is not authorized to access this route`
+                message: `role user is not authorized to access this route`
             });
         }
         next();
