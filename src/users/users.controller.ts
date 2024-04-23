@@ -127,7 +127,32 @@ export class UsersController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  async deleteUserById(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Param('id') id: string
+  ) {
+    const { err } = await this.usersService.deleteUserById(+id, req);
+    if (err !== null) {
+      let statusCode: number;
+      switch (err) {
+        case "not found this user":
+          statusCode = 404;
+        case "you are not authorized to access this user":
+          statusCode = 401;
+        default:
+          statusCode = 500;
+      }
+
+      return res.status(statusCode).json({
+        success: false,
+        message: err
+      })
+    } else {
+      return res.status(200).json({
+        success: true,
+        data: {}
+      })
+    }
   }
 }

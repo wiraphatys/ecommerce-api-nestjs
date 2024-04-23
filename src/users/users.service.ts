@@ -158,10 +158,10 @@ export class UsersService {
           err: null
         }
       } 
-      // role: customer
+      // role: user
       else if (req['user'].roleId === 2) {
         // ownership validation
-        if (req['user'].id === existed.id && existed) {
+        if (existed && req['user'].id === existed.id) {
           if (updateUserDto.password)
             updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10)
 
@@ -193,7 +193,57 @@ export class UsersService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async deleteUserById(id: number, req: Request): Promise<{err: string}> {
+    try {
+      const existed = await this.databaseService.user.findUnique({
+        where: {
+          id
+        }
+      })
+
+      // role: admin
+      if (req['user'].roleId === 1) {
+        if (!existed) {
+          return {
+            err: "not found this user"
+          }
+        }
+
+        await this.databaseService.user.delete({
+          where: {
+            id
+          }
+        })
+        
+        return {
+          err: null
+        }
+
+      } 
+      // role: user
+      else if (req['user'].roleId === 2) {
+        // ownership validation
+        if (existed && req['user'].id === existed.id) {
+          await this.databaseService.user.delete({
+            where: {
+              id
+            }
+          })
+
+          return {
+            err: null
+          }
+        } else {
+          return {
+            err: "you are not authorized to access this user"
+          }
+        }
+      }
+    } catch (err) {
+      console.log("Error: ", err)
+      return {
+        err: err.message
+      }
+    }
   }
 }
