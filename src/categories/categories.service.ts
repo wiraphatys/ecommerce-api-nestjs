@@ -27,8 +27,21 @@ export class CategoriesService {
     }
   }
 
-  findAll() {
-    return `This action returns all categories`;
+  async FindAllCategories(): Promise<{ categories: ProductCategory[], err: string }> {
+    try {
+      const categories = await this.databaseService.productCategory.findMany()
+
+      return {
+        categories,
+        err: null
+      }
+    } catch (err) {
+      console.log("Error: ", err)
+      return {
+        categories: null,
+        err: err.message
+      }
+    }
   }
 
   findOne(id: number) {

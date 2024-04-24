@@ -28,8 +28,21 @@ export class CategoriesController {
   }
 
   @Get()
-  findAll() {
-    return this.categoriesService.findAll();
+  async GetAllCategories(
+    @Res() res: Response
+  ) {
+    const { categories, err } = await this.categoriesService.FindAllCategories();
+    if (err !== null) {
+      return res.status(500).json({
+        success: false,
+        message: err
+      })
+    }
+
+    return res.status(200).json({
+    success: true,
+    data: categories
+    })
   }
 
   @Get(':id')
