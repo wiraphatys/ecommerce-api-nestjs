@@ -58,6 +58,9 @@ export class AppModule implements NestModule {
           { path: "products", method: RequestMethod.POST },
           { path: "products/:id", method: RequestMethod.PATCH },
           { path: "products/:id", method: RequestMethod.DELETE },
+
+          // categories
+          { path: "categories", method: RequestMethod.POST },
         )
   }
 }
