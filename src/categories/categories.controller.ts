@@ -74,8 +74,31 @@ export class CategoriesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
-    return this.categoriesService.update(+id, updateCategoryDto);
+  async UpdateCategoryById(
+    @Res() res: Response,
+    @Param('id') id: string, 
+    @Body() updateCategoryDto: UpdateCategoryDto
+  ) {
+    const { category, err } = await this.categoriesService.UpdateCategoryById(+id, updateCategoryDto);
+    if (err !== null) {
+      let statusCode: number;
+      switch (err) {
+        case "not found this category":
+          statusCode = 404
+        default:
+          statusCode = 500
+      }
+
+      return res.status(statusCode).json({
+        success: false,
+        message: err
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: category
+    })
   }
 
   @Delete(':id')

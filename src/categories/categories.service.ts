@@ -72,8 +72,39 @@ export class CategoriesService {
     }
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
+  async UpdateCategoryById(id: number, updateCategoryDto: UpdateCategoryDto): Promise<{ category: ProductCategory, err: string }> {
+    try {
+      const existed = await this.databaseService.productCategory.findUnique({
+        where: {
+          id
+        }
+      })
+
+      if (!existed) {
+        return {
+          category: null,
+          err: "not found this category"
+        }
+      }
+
+      const category = await this.databaseService.productCategory.update({
+        where: {
+          id
+        },
+        data: updateCategoryDto
+      })
+
+      return {
+        category,
+        err: null
+      }
+    } catch (err) {
+      console.log("Error: ", err)
+      return {
+        category: null,
+        err: err.message
+      }
+    }
   }
 
   remove(id: number) {
