@@ -29,7 +29,16 @@ export class ProductsService {
 
   async FindAllProducts(): Promise<{ products: Product[], err: string }> {
     try {
+      const products = await this.databaseService.product.findMany({
+        include: {
+          category: true
+        }
+      })
 
+      return {
+        products,
+        err: null
+      }
     } catch (err) {
       console.log("Error: ", err)
       return {

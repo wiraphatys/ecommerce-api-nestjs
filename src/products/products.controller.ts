@@ -28,10 +28,22 @@ export class ProductsController {
   }
 
   @Get()
-  GetAllProducts(
+  async GetAllProducts(
     @Res() res: Response,
   ) {
-    return this.productsService.FindAllProducts();
+    const { products, err} = await this.productsService.FindAllProducts();
+    if (err !== null) {
+      return res.status(500).json({
+        success: false,
+        message: err
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      amount: products.length,
+      data: products
+    })
   }
 
   @Get(':id')
