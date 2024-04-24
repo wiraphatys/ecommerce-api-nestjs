@@ -314,4 +314,63 @@ export class UsersService {
       }
     }
   }
+
+  async deleteAddressById(id: number, req: Request): Promise<{ err: string }> {
+    try {
+      const existed = await this.databaseService.user.findUnique({
+        where: {
+          id
+        }
+      })
+
+      // role: admin
+      if (req['user'].roleId === 1) {
+        if (!existed) {
+          return {
+            err: "not found this address"
+          }
+        }
+
+        await this.databaseService.user.delete({
+          where: {
+            id
+          }
+        })
+
+        return {
+          err: null
+        }
+      }
+      // role: user
+      else if (req['user'].roleId === 2) {
+        // ownership validation
+        if (req['user'].id === id) {
+          if (!existed) {
+            return {
+              err: "you have never added your address before, add now !"
+            }
+          }
+
+          await this.databaseService.user.delete({
+            where: {
+              id
+            }
+          })
+
+          return {
+            err: null
+          }
+        } else {
+          return {
+            err: "you are not authorized to access this address"
+          }
+        }
+      }
+    } catch (err) {
+      console.log("Error: ", err)
+      return {
+        err
+      }
+    }
+  }
 }

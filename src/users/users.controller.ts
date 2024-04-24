@@ -164,7 +164,6 @@ export class UsersController {
     @Param('id') id: string,
     @Body() updateAddressDto: UpdateAddressDto
   ) {
-    updateAddressDto.userId = parseInt(id)
     const { address, err } = await this.usersService.updateAddressById(+id, updateAddressDto, req)
     if (err !== null) {
       let statusCode: number;
@@ -185,6 +184,36 @@ export class UsersController {
       return res.status(200).json({
         success: true,
         data: address
+      })
+    }
+  }
+
+  @Delete('address/:id')
+  async deleteAddressById(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Param() id: string
+  ) {
+    const { err } = await this.usersService.deleteAddressById(+id, req);
+    if (err !== null) {
+      let statusCode: number;
+      switch (err) {
+        case "not found this address" || "you have never added your address before, add now !":
+          statusCode = 404;
+        case "you are not authorized to access this address":
+          statusCode = 401;
+        default:
+          statusCode = 500;
+      }
+
+      return res.status(statusCode).json({
+        success: false,
+        message: err
+      })
+    } else {
+      return res.status(200).json({
+        success: true,
+        data: {}
       })
     }
   }

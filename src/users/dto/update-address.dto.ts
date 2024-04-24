@@ -3,8 +3,6 @@ import { IsEmail, IsEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from 
 import { AddressDto } from './address.dto';
 
 export class UpdateAddressDto extends PartialType(AddressDto) {
-    userId: number;
-
     @IsString()
     @IsOptional()
     houseNumber: string;

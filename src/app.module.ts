@@ -39,15 +39,17 @@ export class AppModule implements NestModule {
       consumer
         .apply(Authenticated)
         .forRoutes(
+          // users
           { path: "users/address", method: RequestMethod.POST },
           { path: "users/me", method: RequestMethod.GET },
           { path: "users/:id", method: RequestMethod.PATCH },
           { path: "users/:id", method: RequestMethod.DELETE },
-          { path: "users/address/:id", method: RequestMethod.PATCH }
+          { path: "users/address/:id", method: RequestMethod.PATCH },
+          { path: "users/address/:id", method: RequestMethod.DELETE }
         )
         .apply(Authenticated, AuthorizeAdmin)
         .forRoutes(
-          // enter the route that we want to apply middleware on
+          // users
           { path: "users", method: RequestMethod.GET }
         )
   }
