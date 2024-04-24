@@ -11,7 +11,7 @@ import { APP_PIPE } from '@nestjs/core';
 import { AuthorizeAdmin } from './middleware/authorizeAdmin';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
-import { ProductCategoriesModule } from './product-categories/product-categories.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [ConfigModule.forRoot(), DatabaseModule, UsersModule, ProductsModule, OrdersModule, AuthModule,
@@ -22,7 +22,7 @@ import { ProductCategoriesModule } from './product-categories/product-categories
         expiresIn: process.env.JWT_EXPIRE
       }
     }),
-    ProductCategoriesModule
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [
