@@ -117,7 +117,27 @@ export class ProductsService {
 
   async DeleteProductById(id: number): Promise<{ err: string }> {
     try {
+      const existed = await this.databaseService.product.findUnique({
+        where: {
+          id
+        }
+      })
 
+      if (!existed) {
+        return {
+          err: "not found this product"
+        }
+      }
+
+      await this.databaseService.product.delete({
+        where: {
+          id
+        }
+      })
+
+      return {
+        err: null
+      }
     } catch (err) {
       console.log("Error: ", err)
       return {

@@ -103,8 +103,28 @@ export class ProductsController {
 
   @Delete(':id')
   async DeleteProductById(
+    @Res() res: Response,
     @Param('id') id: string
   ) {
-    const {} = await this.productsService.DeleteProductById(+id);
+    const { err } = await this.productsService.DeleteProductById(+id);
+    if (err !== null) {
+      let statusCode: number;
+      switch (err) {
+        case "not found this product":
+          statusCode = 404
+        default:
+          statusCode = 500
+      }
+
+      return res.status(statusCode).json({
+        success: false,
+        message: err
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {}
+    })
   }
 }
