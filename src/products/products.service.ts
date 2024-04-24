@@ -50,7 +50,26 @@ export class ProductsService {
 
   async FindProductById(id: number): Promise<{ product: Product, err: string }> {
     try {
+      const product = await this.databaseService.product.findUnique({
+        where: {
+          id
+        },
+        include: {
+          category: true
+        }
+      })
 
+      if (!product) {
+        return {
+          product: null,
+          err: "not found this product"
+        }
+      }
+
+      return {
+        product,
+        err: null
+      }
     } catch (err) {
       console.log("Error: ", err)
       return {

@@ -47,11 +47,30 @@ export class ProductsController {
   }
 
   @Get(':id')
-  FindProductById(
+  async FindProductById(
     @Res() res: Response,
     @Param('id') id: string
   ) {
-    return this.productsService.FindProductById(+id);
+    const { product, err } = await this.productsService.FindProductById(+id);
+    if (err !== null) {
+      let statusCode: number
+      switch (err) {
+        case "not found this product":
+          statusCode = 404
+        default:
+          statusCode = 500
+      }
+
+      return res.status(statusCode).json({
+        success: false,
+        message: err
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: product
+    })
   }
 
   @Patch(':id')
