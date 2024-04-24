@@ -44,8 +44,32 @@ export class CategoriesService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} category`;
+  async FindCategoryById(id: number): Promise<{ category: ProductCategory, err: string }> {
+    try {
+      const category = await this.databaseService.productCategory.findUnique({
+        where: {
+          id
+        }
+      })
+
+      if (!category) {
+        return {
+          category: null,
+          err: "not found this category"
+        }
+      }
+
+      return {
+        category,
+        err: null
+      }
+    } catch (err) {
+      console.log("Error: ", err)
+      return {
+        category: null,
+        err: err.message
+      }
+    }
   }
 
   update(id: number, updateCategoryDto: UpdateCategoryDto) {

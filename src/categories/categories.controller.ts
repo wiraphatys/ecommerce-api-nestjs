@@ -41,13 +41,36 @@ export class CategoriesController {
 
     return res.status(200).json({
     success: true,
+    amount: categories.length,
     data: categories
     })
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.categoriesService.findOne(+id);
+  async GetCategoryById(
+    @Res() res: Response,
+    @Param('id') id: string
+  ) {
+    const { category, err } = await this.categoriesService.FindCategoryById(+id);
+    if (err !== null) {
+      let statusCode: number;
+      switch (err) {
+        case "not found this category":
+          statusCode = 404
+        default:
+          statusCode = 500
+      }
+
+      return res.status(statusCode).json({
+        success: false,
+        message: err
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: category
+    })
   }
 
   @Patch(':id')
