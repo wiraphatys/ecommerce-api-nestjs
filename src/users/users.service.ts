@@ -4,7 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { DatabaseService } from 'src/database/database.service';
 import { Address, User } from '@prisma/client';
 import * as bcrypt from 'bcryptjs'
-import { AddressDto } from './dto/address.dto';
+import { CreateAddressDto } from './dto/create-address.dto';
 import { Request } from 'express';
 import { UpdateAddressDto } from './dto/update-address.dto';
 
@@ -45,7 +45,7 @@ export class UsersService {
     }
   }
 
-  async addAddress(addressDto: AddressDto): Promise<{ address: Address, err: string }> {
+  async addAddress(addressDto: CreateAddressDto): Promise<{ address: Address, err: string }> {
     try {
       const address = await this.databaseService.address.create({
         data: addressDto

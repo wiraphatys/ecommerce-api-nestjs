@@ -3,7 +3,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Request, Response } from 'express';
-import { AddressDto } from './dto/address.dto';
+import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 
 @Controller('users')
@@ -31,7 +31,7 @@ export class UsersController {
 
   @Post('address')
   async addAddress(
-    @Body() addressDto: AddressDto,
+    @Body() addressDto: CreateAddressDto,
     @Req() req: Request,
     @Res() res: Response
   ) {
