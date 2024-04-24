@@ -74,18 +74,37 @@ export class ProductsController {
   }
 
   @Patch(':id')
-  UpdateProductById(
+  async UpdateProductById(
     @Res() res: Response,
     @Param('id') id: string, 
     @Body() updateProductDto: UpdateProductDto
   ) {
-    return this.productsService.UpdateProductById(+id, updateProductDto);
+    const { product, err } = await this.productsService.UpdateProductById(+id, updateProductDto);
+    if (err !== null) {
+      let statusCode: number
+      switch (err) {
+        case "not found this product":
+          statusCode = 404
+        default:
+          statusCode = 500
+      }
+
+      return res.status(statusCode).json({
+        success: false,
+        message: err
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: product
+    })
   }
 
   @Delete(':id')
-  DeleteProductById(
+  async DeleteProductById(
     @Param('id') id: string
   ) {
-    return this.productsService.DeleteProductById(+id);
+    const {} = await this.productsService.DeleteProductById(+id);
   }
 }

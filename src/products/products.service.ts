@@ -81,6 +81,30 @@ export class ProductsService {
 
   async UpdateProductById(id: number, updateProductDto: UpdateProductDto): Promise<{ product: Product, err: string }> {
     try {
+      const existed = await this.databaseService.product.findUnique({
+        where: {
+          id
+        }
+      })
+
+      if (!existed) {
+        return {
+          product: null,
+          err: "not found this product"
+        }
+      }
+
+      const product = await this.databaseService.product.update({
+        where: {
+          id
+        },
+        data: updateProductDto
+      })
+
+      return {
+        product,
+        err: null
+      }
 
     } catch (err) {
       console.log("Error: ", err)
