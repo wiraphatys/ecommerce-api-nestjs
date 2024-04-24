@@ -250,9 +250,9 @@ export class UsersService {
 
   async updateAddressById(id: number, updateAddressDto: UpdateAddressDto, req: Request): Promise<{ address: Address, err: string }> {
     try {
-      const existed = await this.databaseService.user.findUnique({
+      const existed = await this.databaseService.address.findUnique({
         where: {
-          id
+          userId: id
         }
       })
 
@@ -317,9 +317,9 @@ export class UsersService {
 
   async deleteAddressById(id: number, req: Request): Promise<{ err: string }> {
     try {
-      const existed = await this.databaseService.user.findUnique({
+      const existed = await this.databaseService.address.findUnique({
         where: {
-          id
+          userId: id
         }
       })
 
@@ -331,9 +331,9 @@ export class UsersService {
           }
         }
 
-        await this.databaseService.user.delete({
+        await this.databaseService.address.delete({
           where: {
-            id
+            userId: id
           }
         })
 
@@ -351,9 +351,9 @@ export class UsersService {
             }
           }
 
-          await this.databaseService.user.delete({
+          await this.databaseService.address.delete({
             where: {
-              id
+              userId: id
             }
           })
 

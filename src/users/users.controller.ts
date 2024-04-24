@@ -192,7 +192,7 @@ export class UsersController {
   async deleteAddressById(
     @Req() req: Request,
     @Res() res: Response,
-    @Param() id: string
+    @Param('id') id: string
   ) {
     const { err } = await this.usersService.deleteAddressById(+id, req);
     if (err !== null) {
