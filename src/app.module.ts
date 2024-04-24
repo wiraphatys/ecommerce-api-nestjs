@@ -50,7 +50,10 @@ export class AppModule implements NestModule {
         .apply(Authenticated, AuthorizeAdmin)
         .forRoutes(
           // users
-          { path: "users", method: RequestMethod.GET }
+          { path: "users", method: RequestMethod.GET },
+
+          // products
+          { path: "products", method: RequestMethod.POST }
         )
   }
 }

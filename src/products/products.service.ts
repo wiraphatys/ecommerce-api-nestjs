@@ -10,7 +10,14 @@ export class ProductsService {
 
   async InsertProduct(createProductDto: CreateProductDto): Promise<{ product: Product, err: string }> {
     try {
-      
+      const product = await this.databaseService.product.create({
+        data: createProductDto
+      })
+
+      return {
+        product,
+        err: null
+      }
     } catch (err) {
       console.log("Error: ", err)
       return {

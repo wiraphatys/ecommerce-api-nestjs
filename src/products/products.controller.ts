@@ -9,11 +9,22 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  CreateProduct(
+  async CreateProduct(
     @Res() res: Response,
     @Body() createProductDto: CreateProductDto
   ) {
-    return this.productsService.InsertProduct(createProductDto);
+    const { product, err } = await this.productsService.InsertProduct(createProductDto)
+    if (err !== null) {
+      return res.status(500).json({
+        success: false,
+        message: err
+      })
+    } 
+    
+    return res.status(201).json({
+      success: true,
+      data: product
+    })
   }
 
   @Get()
