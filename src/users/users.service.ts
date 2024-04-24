@@ -14,7 +14,7 @@ export class UsersService {
   constructor(
     private readonly databaseService: DatabaseService,
   ) { }
-  async createUser(createUserDto: CreateUserDto): Promise<{ user: User, err: string }> {
+  async InsertUser(createUserDto: CreateUserDto): Promise<{ user: User, err: string }> {
     try {
       // hashing password
       const hashedPassword: string = await bcrypt.hash(createUserDto.password, 10)
@@ -45,7 +45,7 @@ export class UsersService {
     }
   }
 
-  async addAddress(addressDto: CreateAddressDto): Promise<{ address: Address, err: string }> {
+  async InsertAddress(addressDto: CreateAddressDto): Promise<{ address: Address, err: string }> {
     try {
       const address = await this.databaseService.address.create({
         data: addressDto
@@ -70,7 +70,7 @@ export class UsersService {
     }
   }
 
-  async getProfile(userId: number): Promise<{ user: User, err: string }> {
+  async FindUserProfile(userId: number): Promise<{ user: User, err: string }> {
     try {
       const user = await this.databaseService.user.findUnique({
         where: {
@@ -102,7 +102,7 @@ export class UsersService {
     }
   }
 
-  async findAll(): Promise<{ users: User[], err: string }> {
+  async FindAllUsers(): Promise<{ users: User[], err: string }> {
     try {
       const users = await this.databaseService.user.findMany();
       if (!users) {
@@ -125,7 +125,7 @@ export class UsersService {
     }
   }
 
-  async updateUserById(id: number, updateUserDto: UpdateUserDto, req: Request): Promise<{ user: User, err: string }> {
+  async UpdateUserById(id: number, updateUserDto: UpdateUserDto, req: Request): Promise<{ user: User, err: string }> {
     try {
       // check existed user
       const existed = await this.databaseService.user.findUnique({
@@ -194,7 +194,7 @@ export class UsersService {
     }
   }
 
-  async deleteUserById(id: number, req: Request): Promise<{ err: string }> {
+  async DeleteUserById(id: number, req: Request): Promise<{ err: string }> {
     try {
       const existed = await this.databaseService.user.findUnique({
         where: {
@@ -248,7 +248,7 @@ export class UsersService {
     }
   }
 
-  async updateAddressById(id: number, updateAddressDto: UpdateAddressDto, req: Request): Promise<{ address: Address, err: string }> {
+  async UpdateAddressById(id: number, updateAddressDto: UpdateAddressDto, req: Request): Promise<{ address: Address, err: string }> {
     try {
       const existed = await this.databaseService.address.findUnique({
         where: {
@@ -315,7 +315,7 @@ export class UsersService {
     }
   }
 
-  async deleteAddressById(id: number, req: Request): Promise<{ err: string }> {
+  async DeleteAddressById(id: number, req: Request): Promise<{ err: string }> {
     try {
       const existed = await this.databaseService.address.findUnique({
         where: {

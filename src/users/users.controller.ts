@@ -11,11 +11,11 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
   @Post('register')
-  async createUser(
+  async CreateUser(
     @Body() createUserDto: CreateUserDto,
     @Res() res: Response
   ) {
-    const { user, err } = await this.usersService.createUser(createUserDto)
+    const { user, err } = await this.usersService.InsertUser(createUserDto)
     if (err !== null) {
       return res.status(500).json({
         success: false,
@@ -30,14 +30,14 @@ export class UsersController {
   }
 
   @Post('address')
-  async addAddress(
+  async CreateAddress(
     @Body() addressDto: CreateAddressDto,
     @Req() req: Request,
     @Res() res: Response
   ) {
     addressDto.userId = req['user'].id
 
-    const { address, err } = await this.usersService.addAddress(addressDto)
+    const { address, err } = await this.usersService.InsertAddress(addressDto)
     if (err !== null) {
       return res.status(500).json({
         success: false,
@@ -52,11 +52,11 @@ export class UsersController {
   }
 
   @Get('me')
-  async getProfile(
+  async GetProfile(
     @Req() req: Request,
     @Res() res: Response
   ) {
-    const { user, err } = await this.usersService.getProfile(req['user'].id)
+    const { user, err } = await this.usersService.FindUserProfile(req['user'].id)
     if (err !== null) {
       return res.status(400).json({
         success: false,
@@ -71,8 +71,8 @@ export class UsersController {
   }
 
   @Get()
-  async findAll(@Res() res: Response) {
-    const { users, err } = await this.usersService.findAll();
+  async GetAllUsers(@Res() res: Response) {
+    const { users, err } = await this.usersService.FindAllUsers();
     if (err !== null) {
       switch (err) {
         case "not found any user":
@@ -97,13 +97,13 @@ export class UsersController {
   }
 
   @Patch(':id')
-  async updateUserById(
+  async UpdateUserById(
     @Req() req: Request,
     @Res() res: Response,
     @Param('id') id: string, 
     @Body() updateUserDto: UpdateUserDto
   ) {
-    const { user, err } = await this.usersService.updateUserById(+id, updateUserDto, req);
+    const { user, err } = await this.usersService.UpdateUserById(+id, updateUserDto, req);
     if (err !== null) {
       let statusCode: number;
       switch (err) {
@@ -128,12 +128,12 @@ export class UsersController {
   }
 
   @Delete(':id')
-  async deleteUserById(
+  async DeleteUserById(
     @Req() req: Request,
     @Res() res: Response,
     @Param('id') id: string
   ) {
-    const { err } = await this.usersService.deleteUserById(+id, req);
+    const { err } = await this.usersService.DeleteUserById(+id, req);
     if (err !== null) {
       let statusCode: number;
       switch (err) {
@@ -158,13 +158,13 @@ export class UsersController {
   }
 
   @Patch('address/:id')
-  async updateAddressById(
+  async UpdateAddressById(
     @Req() req: Request,
     @Res() res: Response,
     @Param('id') id: string,
     @Body() updateAddressDto: UpdateAddressDto
   ) {
-    const { address, err } = await this.usersService.updateAddressById(+id, updateAddressDto, req)
+    const { address, err } = await this.usersService.UpdateAddressById(+id, updateAddressDto, req)
     if (err !== null) {
       let statusCode: number;
       switch (err) {
@@ -189,12 +189,12 @@ export class UsersController {
   }
 
   @Delete('address/:id')
-  async deleteAddressById(
+  async DeleteAddressById(
     @Req() req: Request,
     @Res() res: Response,
     @Param('id') id: string
   ) {
-    const { err } = await this.usersService.deleteAddressById(+id, req);
+    const { err } = await this.usersService.DeleteAddressById(+id, req);
     if (err !== null) {
       let statusCode: number;
       switch (err) {
