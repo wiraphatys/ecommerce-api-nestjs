@@ -107,7 +107,34 @@ export class CategoriesService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+  async DeleteCategoryById(id: number): Promise<{ err: string }> {
+    try {
+      const existed = await this.databaseService.productCategory.findUnique({
+        where: {
+          id
+        }
+      })
+
+      if (!existed) {
+        return {
+          err: "not found this category"
+        }
+      }
+
+      await this.databaseService.productCategory.delete({
+        where: { 
+          id
+        }
+      })
+
+      return {
+        err: null
+      }
+    } catch (err) {
+      console.log("Error: ", err)
+      return {
+        err: err.message
+      }
+    }
   }
 }
