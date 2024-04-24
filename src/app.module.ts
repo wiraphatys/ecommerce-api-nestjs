@@ -14,14 +14,14 @@ import { ConfigModule } from '@nestjs/config';
 import { CategoriesModule } from './categories/categories.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), DatabaseModule, UsersModule, ProductsModule, OrdersModule, AuthModule,
-    JwtModule.register({
-      global: true,
-      secret: process.env.JWT_SECRET,
-      signOptions: {
-        expiresIn: process.env.JWT_EXPIRE
-      }
-    }),
+  imports: [
+    ConfigModule, 
+    DatabaseModule, 
+    AuthModule,
+    JwtModule,
+    UsersModule, 
+    ProductsModule, 
+    OrdersModule, 
     CategoriesModule,
   ],
   controllers: [AppController],
