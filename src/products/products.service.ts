@@ -2,12 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from '@prisma/client';
+import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
 export class ProductsService {
+  constructor(private readonly databaseService: DatabaseService) {}
+
   async InsertProduct(createProductDto: CreateProductDto): Promise<{ product: Product, err: string }> {
     try {
-
+      
     } catch (err) {
       console.log("Error: ", err)
       return {
