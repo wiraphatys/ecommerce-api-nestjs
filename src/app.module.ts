@@ -67,6 +67,9 @@ export class AppModule implements NestModule {
           { path: "categories", method: RequestMethod.POST },
           { path: "categories/:id", method: RequestMethod.PATCH },
           { path: "categories/:id", method: RequestMethod.DELETE },
+
+          // orders
+          { path: "orders", method: RequestMethod.GET }
         )
         .apply(Authenticated, AuthorizeUser)
         .forRoutes(

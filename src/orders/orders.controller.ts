@@ -29,12 +29,26 @@ export class OrdersController {
   }
 
   @Get()
-  async FindAllOrders() {
+  async GetAllOrders(
+    @Res() res: Response,
+  ) {
     const { orders, err } = await this.ordersService.FindAllOrders();
+    if (err !== null) {
+      return res.status(500).json({
+        success: true,
+        message: err
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      amount: orders.length,
+      data: orders
+    })
   }
 
   @Get(':id')
-  async FindOrderById(@Param('id') id: string) {
+  async GetOrderById(@Param('id') id: string) {
     const { order, err } = await this.ordersService.FindOrderById(+id);
   }
 

@@ -54,7 +54,16 @@ export class OrdersService {
 
   async FindAllOrders(): Promise<{ orders: Order[], err: string }> {
     try {
+      const orders = await this.databaseService.order.findMany({
+        include: {
+          orderLines: true
+        }
+      })
 
+      return {
+        orders,
+        err: null
+      }
     } catch (err) {
       console.log("Error: ", err)
       return {
