@@ -97,25 +97,104 @@ export class OrdersService {
     }
   }
 
-  async FindOrderById(id: number): Promise<{ order: Order, err: string }> {
+  async FindOrderById(id: string, req: Request): Promise<{ order: Order, err: string }> {
     try {
+      const order = await this.databaseService.order.findUnique({
+        where: {
+          id
+        },
+        include: {
+          orderLines: true
+        }
+      })
 
+      // role: admin
+      if (req['user'].roleId === 1) {
+        if (!order) {
+          return {
+            order: null,
+            err: "not found this order"
+          }
+        }
+
+        return {
+          order,
+          err: null
+        }
+      } 
+      // role: user
+      else if (req['user'].roleId === 2) {
+        // ownership validation
+        if (order && order.userId === req['user'].id) {
+          return {
+            order,
+            err: null
+          }
+        } else {
+          return {
+            order: null,
+            err: "you are not authorized to access this order"
+          }
+        }
+      }
     } catch (err) {
       console.log("Error: ", err)
       return {
         order: null,
-        err
+        err: err.message
       }
     }  
   }
 
-  async DeleteOrderById(id: number): Promise<{ err: string }> {
+  async DeleteOrderById(id: string, req: Request): Promise<{ err: string }> {
     try {
+      const order = await this.databaseService.order.findUnique({
+        where: {
+          id
+        }
+      })
 
+      // role: admin
+      if (req['user'].roleId === 1) {
+        if (!order) {
+          return {
+            err: "not found this order"
+          }
+        }
+
+        await this.databaseService.order.delete({
+          where: {
+            id
+          }
+        })
+
+        return {
+          err: null
+        }
+      }
+      // role: user
+      else if (req['user'].roleId === 2) {
+        // ownership validation
+        if (order && order.userId === req['user'].id) {
+          await this.databaseService.order.delete({
+            where: {
+              id
+            }
+          })
+
+          return {
+            err: null
+          }
+        } else {
+          return {
+            err: "you are not authorized to access this order"
+          }
+        }
+      }
     } catch (err) {
       console.log("Error: ", err)
       return {
-        err
+        err: err.message
       }
     }  
   }
