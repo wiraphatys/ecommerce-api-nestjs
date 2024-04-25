@@ -1,26 +1,54 @@
 import { Injectable } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { Order } from '@prisma/client';
 
 @Injectable()
 export class OrdersService {
-  create(createOrderDto: CreateOrderDto) {
-    return 'This action adds a new order';
+  async InsertOrder(createOrderDto: CreateOrderDto): Promise<{ order: Order, err: string }> {
+    try {
+
+    } catch (err) {
+      console.log("Error: ", err)
+      return {
+        order: null,
+        err
+      }
+    }
   }
 
-  findAll() {
-    return `This action returns all orders`;
+  async FindAllOrders(): Promise<{ orders: Order[], err: string }> {
+    try {
+
+    } catch (err) {
+      console.log("Error: ", err)
+      return {
+        orders: null,
+        err
+      }
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  async FindOrderById(id: number): Promise<{ order: Order, err: string }> {
+    try {
+
+    } catch (err) {
+      console.log("Error: ", err)
+      return {
+        order: null,
+        err
+      }
+    }  
   }
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
-  }
+  async DeleteOrderById(id: number): Promise<{ err: string }> {
+    try {
 
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+    } catch (err) {
+      console.log("Error: ", err)
+      return {
+        err
+      }
+    }  
   }
 }
