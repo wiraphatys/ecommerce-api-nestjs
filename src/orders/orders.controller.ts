@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Req } from '@ne
 import { OrdersService } from './orders.service';
 import { Response } from 'express';
 import { CreateOrderDataDto } from './dto/create-orderData.dto';
+import { Order } from '@prisma/client';
 
 @Controller('orders')
 export class OrdersController {
@@ -30,9 +31,25 @@ export class OrdersController {
 
   @Get()
   async GetAllOrders(
+    @Req() req: Request,
     @Res() res: Response,
   ) {
-    const { orders, err } = await this.ordersService.FindAllOrders();
+    let orders: Order[]
+    let err: string
+
+    const userRole: number = req['user'].roleId
+
+    switch (userRole) {
+      case 1:
+        ({ orders, err } = await this.ordersService.FindAllOrders())
+        break;
+      case 2:
+        ({ orders, err } = await this.ordersService.FindOwnOrders(req['user'].id))
+        break;
+      default:
+        err = "invalid user role"
+    }
+
     if (err !== null) {
       return res.status(500).json({
         success: true,

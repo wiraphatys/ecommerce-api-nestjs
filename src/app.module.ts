@@ -51,7 +51,8 @@ export class AppModule implements NestModule {
           { path: "users/address/:id", method: RequestMethod.DELETE },
 
           // orders
-
+          { path: "orders", method: RequestMethod.GET }
+          
         )
         .apply(Authenticated, AuthorizeAdmin)
         .forRoutes(
@@ -69,7 +70,7 @@ export class AppModule implements NestModule {
           { path: "categories/:id", method: RequestMethod.DELETE },
 
           // orders
-          { path: "orders", method: RequestMethod.GET }
+
         )
         .apply(Authenticated, AuthorizeUser)
         .forRoutes(

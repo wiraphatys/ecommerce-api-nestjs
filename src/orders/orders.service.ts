@@ -73,6 +73,30 @@ export class OrdersService {
     }
   }
 
+  async FindOwnOrders(userId: number): Promise<{ orders: Order[], err: string }> {
+    try {
+      const orders = await this.databaseService.order.findMany({
+        where: {
+          userId
+        },
+        include: {
+          orderLines: true
+        }
+      })
+
+      return {
+        orders,
+        err: null
+      }
+    } catch (err) {
+      console.log("Error: ", err)
+      return {
+        orders: null,
+        err
+      }
+    }
+  }
+
   async FindOrderById(id: number): Promise<{ order: Order, err: string }> {
     try {
 
