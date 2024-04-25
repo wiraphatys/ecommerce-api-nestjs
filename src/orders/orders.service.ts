@@ -125,14 +125,7 @@ export class OrdersService {
       // role: user
       else if (req['user'].roleId === 2) {
         // ownership validation
-        if (order.userId === req['user'].id) {
-          if (!order) {
-            return {
-              order: null,
-              err: "not found this order"
-            }
-          }
-
+        if (order && order.userId === req['user'].id) {
           return {
             order,
             err: null
@@ -148,18 +141,60 @@ export class OrdersService {
       console.log("Error: ", err)
       return {
         order: null,
-        err
+        err: err.message
       }
     }  
   }
 
-  async DeleteOrderById(id: number): Promise<{ err: string }> {
+  async DeleteOrderById(id: string, req: Request): Promise<{ err: string }> {
     try {
+      const order = await this.databaseService.order.findUnique({
+        where: {
+          id
+        }
+      })
 
+      // role: admin
+      if (req['user'].roleId === 1) {
+        if (!order) {
+          return {
+            err: "not found this order"
+          }
+        }
+
+        await this.databaseService.order.delete({
+          where: {
+            id
+          }
+        })
+
+        return {
+          err: null
+        }
+      }
+      // role: user
+      else if (req['user'].roleId === 2) {
+        // ownership validation
+        if (order && order.userId === req['user'].id) {
+          await this.databaseService.order.delete({
+            where: {
+              id
+            }
+          })
+
+          return {
+            err: null
+          }
+        } else {
+          return {
+            err: "you are not authorized to access this order"
+          }
+        }
+      }
     } catch (err) {
       console.log("Error: ", err)
       return {
-        err
+        err: err.message
       }
     }  
   }

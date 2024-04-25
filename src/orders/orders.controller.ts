@@ -97,7 +97,34 @@ export class OrdersController {
   }
 
   @Delete(':id')
-  async DeleteOrderById(@Param('id') id: string) {
-    const { err } = await this.ordersService.DeleteOrderById(+id);
+  async DeleteOrderById(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Param('id') id: string
+  ) {
+    const { err } = await this.ordersService.DeleteOrderById(id, req);
+    if (err !== null) {
+      let statusCode: number
+      switch (err) {
+        case "you are not authorized to access this order":
+          statusCode = 401
+          break;
+        case "not found this order":
+          statusCode = 404
+          break;
+        default:
+          statusCode = 500
+      }
+
+      return res.status(statusCode).json({
+        success: false,
+        message: err
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {}
+    })
   }
 }
