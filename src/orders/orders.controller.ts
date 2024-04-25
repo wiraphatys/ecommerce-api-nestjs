@@ -1,34 +1,76 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Req } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
+import { Response } from 'express';
+import { CreateOrderDataDto } from './dto/create-orderData.dto';
+import { Order } from '@prisma/client';
 
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
+  async CreateOrder(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Body() createOrderDataDto: CreateOrderDataDto
+  ) {
+    createOrderDataDto.userId = req['user'].id
+    const { order, err} = await this.ordersService.InsertOrderWithLines(createOrderDataDto);
+    if (err !== null) {
+      return res.status(500).json({
+        success: false,
+        message: err
+      })
+    }
+
+    return res.status(201).json({
+      success: true,
+      data: order
+    })
   }
 
   @Get()
-  findAll() {
-    return this.ordersService.findAll();
+  async GetAllOrders(
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    let orders: Order[]
+    let err: string
+
+    const userRole: number = req['user'].roleId
+
+    switch (userRole) {
+      case 1:
+        ({ orders, err } = await this.ordersService.FindAllOrders())
+        break;
+      case 2:
+        ({ orders, err } = await this.ordersService.FindOwnOrders(req['user'].id))
+        break;
+      default:
+        err = "invalid user role"
+    }
+
+    if (err !== null) {
+      return res.status(500).json({
+        success: true,
+        message: err
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      amount: orders.length,
+      data: orders
+    })
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ordersService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.ordersService.update(+id, updateOrderDto);
+  async GetOrderById(@Param('id') id: string) {
+    const { order, err } = await this.ordersService.FindOrderById(+id);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ordersService.remove(+id);
+  async DeleteOrderById(@Param('id') id: string) {
+    const { err } = await this.ordersService.DeleteOrderById(+id);
   }
 }

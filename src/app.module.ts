@@ -12,6 +12,7 @@ import { AuthorizeAdmin } from './middleware/authorizeAdmin';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { CategoriesModule } from './categories/categories.module';
+import { AuthorizeUser } from './middleware/authorizeUser';
 
 @Module({
   imports: [
@@ -47,7 +48,11 @@ export class AppModule implements NestModule {
           { path: "users/:id", method: RequestMethod.PATCH },
           { path: "users/:id", method: RequestMethod.DELETE },
           { path: "users/address/:id", method: RequestMethod.PATCH },
-          { path: "users/address/:id", method: RequestMethod.DELETE }
+          { path: "users/address/:id", method: RequestMethod.DELETE },
+
+          // orders
+          { path: "orders", method: RequestMethod.GET }
+          
         )
         .apply(Authenticated, AuthorizeAdmin)
         .forRoutes(
@@ -63,6 +68,14 @@ export class AppModule implements NestModule {
           { path: "categories", method: RequestMethod.POST },
           { path: "categories/:id", method: RequestMethod.PATCH },
           { path: "categories/:id", method: RequestMethod.DELETE },
+
+          // orders
+
+        )
+        .apply(Authenticated, AuthorizeUser)
+        .forRoutes(
+          // orders
+          { path: "orders", method: RequestMethod.POST },
         )
   }
 }

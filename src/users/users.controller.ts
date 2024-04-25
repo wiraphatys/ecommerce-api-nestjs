@@ -109,8 +109,10 @@ export class UsersController {
       switch (err) {
         case "not found this user":
           statusCode = 404;
+          break;
         case "you are not authorized to access this user":
           statusCode = 401;
+          break;
         default:
           statusCode = 500;
       }
@@ -139,8 +141,10 @@ export class UsersController {
       switch (err) {
         case "not found this user":
           statusCode = 404;
+          break;
         case "you are not authorized to access this user":
           statusCode = 401;
+          break;
         default:
           statusCode = 500;
       }
@@ -170,8 +174,10 @@ export class UsersController {
       switch (err) {
         case "not found this address" || "you have never added your address before, add now !":
           statusCode = 404;
+          break;
         case "you are not authorized to access this address":
           statusCode = 401;
+          break;
         default:
           statusCode = 500;
       }
@@ -200,8 +206,10 @@ export class UsersController {
       switch (err) {
         case "not found this address" || "you have never added your address before, add now !":
           statusCode = 404;
+          break;
         case "you are not authorized to access this address":
           statusCode = 401;
+          break;
         default:
           statusCode = 500;
       }
