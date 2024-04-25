@@ -57,6 +57,7 @@ export class ProductsController {
       switch (err) {
         case "not found this product":
           statusCode = 404
+          break;
         default:
           statusCode = 500
       }
@@ -85,6 +86,7 @@ export class ProductsController {
       switch (err) {
         case "not found this product":
           statusCode = 404
+          break;
         default:
           statusCode = 500
       }
@@ -112,6 +114,7 @@ export class ProductsController {
       switch (err) {
         case "not found this product":
           statusCode = 404
+          break;
         default:
           statusCode = 500
       }
