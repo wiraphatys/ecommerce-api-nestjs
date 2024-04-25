@@ -1,6 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
-  binaryTargets   = ["native", "linux-arm64-openssl-3.0.x"]
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-arm64-openssl-3.0.x"]
 }
 
 datasource db {
@@ -29,6 +29,7 @@ model User {
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt
   address  Address?
+  carts    Cart[]
   orders   Order[]
 }
 
@@ -44,6 +45,18 @@ model Address {
   updateAt    DateTime @updatedAt
 }
 
+model Cart {
+  userId    Int      
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId Int      
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity  Int
+  createAt  DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  @@id([userId, productId])
+}
+
 model Product {
   id         Int             @id @default(autoincrement())
   name       String
@@ -55,6 +68,7 @@ model Product {
   createAt   DateTime        @default(now())
   updateAt   DateTime        @updatedAt
   orderLines OrderLine[]
+  carts      Cart[]
 }
 
 model ProductCategory {
