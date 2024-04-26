@@ -13,6 +13,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { CategoriesModule } from './categories/categories.module';
 import { AuthorizeUser } from './middleware/authorizeUser';
+import { CartsModule } from './carts/carts.module';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { AuthorizeUser } from './middleware/authorizeUser';
     UsersModule, 
     ProductsModule, 
     OrdersModule, 
-    CategoriesModule,
+    CategoriesModule, CartsModule,
   ],
   controllers: [AppController],
   providers: [
