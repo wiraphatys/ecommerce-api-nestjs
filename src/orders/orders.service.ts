@@ -12,26 +12,54 @@ export class OrdersService {
 
   async InsertOrderWithLines(createOrderDataDto: CreateOrderDataDto): Promise<{ order: Order, err: string }> {
     try {
+      const orderId: string = uuid.v4();
       return this.databaseService.$transaction(async (prisma) => {
         const createOrderDto = {
-          id: uuid.v4(),
+          id: orderId,
           userId: createOrderDataDto.userId
         }
 
-        const order = await prisma.order.create({ 
+        // validate product quantities
+        let productToUpdate: { id: number, quantity: number }[] = [];
+        for (const item of createOrderDataDto.items) {
+          const product = await prisma.product.findUnique({ where: { id: item.productId }})
+          if (product.quantity < item.quantity) {
+            throw new Error(`insufficient quantity for product ${item.productId}`)
+          }
+
+          productToUpdate.push({ id: item.productId, quantity: item.quantity })
+        }
+
+        // update products' quantity
+        for (const product of productToUpdate) {
+          await prisma.product.update({
+            where: {
+              id: product.id
+            },
+            data: {
+              quantity: {
+                decrement: product.quantity
+              }
+            }
+          })
+        }
+
+        // excute create order with orderlines
+        await prisma.order.create({
           data: createOrderDto
         })
 
-        const orderLines: CreateOrderLineDto[] = createOrderDataDto.items.map(item => ({
-          ...item,
-          orderId: order.id
-        }))
+        await prisma.orderLine.createMany({
+          data: createOrderDataDto.items.map(item => ({
+            ...item,
+            orderId
+          }))
+        })
 
-        await prisma.orderLine.createMany({ data: orderLines })
-
+        // query created order
         const createdOrder = await prisma.order.findUnique({
           where: {
-            id: order.id
+            id: orderId
           },
           include: {
             orderLines: true
