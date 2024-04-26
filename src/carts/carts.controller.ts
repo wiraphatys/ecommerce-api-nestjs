@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Req, Redirect, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Req, Query } from '@nestjs/common';
 import { CartsService } from './carts.service';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
-import { query, Response } from 'express';
+import { Response } from 'express';
 import { Cart } from '@prisma/client';
 
 @Controller('carts')
@@ -73,9 +73,54 @@ export class CartsController {
     })
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.cartsService.findOne(+id);
+  @Get(':productId')
+  async GetCartItemById(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Param('productId') productId: string,
+    @Query('uid') uid: string
+  ) {
+    let userId: number;
+    let statusCode = 400;
+
+    const userRole = req['user'].roleId;
+    switch (userRole) {
+      case 1:
+        if (uid === undefined) {
+          break;
+        }
+        userId = +uid;
+        break;
+      case 2:
+        userId = req['user'].id
+        break;
+      default:
+        return res.status(statusCode).json({ success: false, message: "invalid user role"})
+
+    }
+    const { item, err } = await this.cartsService.FindCartItemById(+productId, userId, req)
+    if (err !== null) {
+      switch (err) {
+        case "not found this cart item":
+          statusCode = 404
+          break
+        case "you are not authorized to access this cart item":
+          statusCode = 401
+          break
+        default:
+          statusCode = 500
+      }
+
+      return res.status(statusCode).json({
+        success: false,
+        message: err
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: item
+    })
   }
 
   @Patch(':id')

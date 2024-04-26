@@ -78,8 +78,54 @@ export class CartsService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} cart`;
+  async FindCartItemById(productId: number, userId: number, req: Request): Promise<{ item: Cart, err: string }> {
+    try {
+      const cartItem = await this.databaseService.cart.findFirst({
+        where: {
+          productId,
+          userId
+        },
+        include: {
+          product: true
+        }
+      })
+
+      // role: admin
+      if (req['user'].roleId === 1) {
+        if (!cartItem) {
+          return {
+            item: null,
+            err: "not found this cart item"
+          }
+        }
+
+        return {
+          item: cartItem,
+          err: null
+        }
+      } 
+      // role: customer
+      else if (req['user'].roleId === 2) {
+        // ownership validation
+        if (cartItem && req['user'].id === cartItem.userId) {
+          return {
+            item: cartItem,
+            err: null
+          }
+        } else {
+          return {
+            item: null,
+            err: "you are not authorized to access this cart item"
+          }
+        }
+      }
+    } catch (err) {
+      console.log("Error: ", err)
+      return {
+        item: null,
+        err: err.message
+      }
+    }
   }
 
   update(id: number, updateCartDto: UpdateCartDto) {
