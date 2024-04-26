@@ -30,8 +30,52 @@ export class CartsService {
     }
   }
 
-  findAll() {
-    return `This action returns all carts`;
+  async FindAllUsersCart(userId: number): Promise<{ items: Cart[], err: string }> {
+    try {
+      const items = await this.databaseService.cart.findMany({
+        where: {
+          userId
+        },
+        include: {
+          product: true
+        }
+      })
+
+      return {
+        items,
+        err: null
+      }
+    } catch (err) {
+      console.log("Error: ", err)
+      return {
+        items: null,
+        err: err.message
+      }
+    }
+  }
+
+  async FindOwnCart(userId: number): Promise<{ items: Cart[], err: string }> {
+    try {
+      const items = await this.databaseService.cart.findMany({
+        where: {
+          userId
+        },
+        include: {
+          product: true
+        }
+      })
+
+      return {
+        items,
+        err: null
+      }
+    } catch (err) {
+      console.log("Error: ", err)
+      return {
+        items: null,
+        err: err.message
+      }
+    }
   }
 
   findOne(id: number) {
