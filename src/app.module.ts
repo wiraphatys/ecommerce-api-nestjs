@@ -17,7 +17,7 @@ import { CartsModule } from './carts/carts.module';
 
 @Module({
   imports: [
-    ConfigModule, 
+    ConfigModule.forRoot(), 
     DatabaseModule, 
     AuthModule,
     JwtModule,
