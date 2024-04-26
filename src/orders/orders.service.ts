@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { CreateOrderLineDto } from './dto/create-orderLine.dto';
-import { Order, OrderLine } from '@prisma/client';
+import { Order } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
 import { CreateOrderDataDto } from './dto/create-orderData.dto';
 import * as uuid from 'uuid'
