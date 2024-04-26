@@ -77,6 +77,10 @@ export class AppModule implements NestModule {
         .forRoutes(
           // orders
           { path: "orders", method: RequestMethod.POST },
+
+          // carts
+          { path: "carts", method: RequestMethod.POST },
+
         )
   }
 }
