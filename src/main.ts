@@ -1,12 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import * as csurf from 'csurf';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // middleware
   app.use(cookieParser());
+  app.use(helmet());
+  app.use(csurf());
 
   // listen on port 3000 and set global prefix
   app.setGlobalPrefix("api/v1");
