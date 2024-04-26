@@ -55,6 +55,7 @@ model Cart {
   updateAt  DateTime @updatedAt
 
   @@id([userId, productId])
+  @@unique([userId, productId])
 }
 
 model Product {
@@ -100,6 +101,7 @@ model OrderLine {
   updateAt  DateTime @updatedAt
 
   @@id([orderId, productId])
+  @@unique([orderId, productId])
 }
 
 model Payment {

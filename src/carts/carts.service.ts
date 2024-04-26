@@ -78,15 +78,184 @@ export class CartsService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} cart`;
+  async FindCartItemById(productId: number, userId: number, req: Request): Promise<{ item: Cart, err: string }> {
+    try {
+      const cartItem = await this.databaseService.cart.findFirst({
+        where: {
+          productId,
+          userId
+        },
+        include: {
+          product: true
+        }
+      })
+
+      // role: admin
+      if (req['user'].roleId === 1) {
+        if (!cartItem) {
+          return {
+            item: null,
+            err: "not found this cart item"
+          }
+        }
+
+        return {
+          item: cartItem,
+          err: null
+        }
+      } 
+      // role: customer
+      else if (req['user'].roleId === 2) {
+        // ownership validation
+        if (cartItem && req['user'].id === cartItem.userId) {
+          return {
+            item: cartItem,
+            err: null
+          }
+        } else {
+          return {
+            item: null,
+            err: "you are not authorized to access this cart item"
+          }
+        }
+      }
+    } catch (err) {
+      console.log("Error: ", err)
+      return {
+        item: null,
+        err: err.message
+      }
+    }
   }
 
-  update(id: number, updateCartDto: UpdateCartDto) {
-    return `This action updates a #${id} cart`;
+  async UpdateCartItemById(productId: number, userId: number, req: Request, updateCartDto: UpdateCartDto): Promise<{ item: Cart, err: string }> {
+    try {
+      const existed = await this.databaseService.cart.findFirst({
+        where: {
+          productId,
+          userId
+        }
+      })
+
+      // role: admin
+      if (req['user'].roleId === 1) {
+        if (!existed) {
+          return {
+            item: null,
+            err: "not found this cart item"
+          }
+        }
+
+        const item = await this.databaseService.cart.update({
+          where: {
+            userId_productId: {
+              userId: userId,
+              productId: productId
+            }
+          },
+          data: {
+            quantity: updateCartDto.quantity
+          }
+        });
+
+        return {
+          item,
+          err: null
+        }
+      } 
+      // role: customer
+      else if (req['user'].roleId === 2) {
+        // ownership validation
+        if (existed && req['user'].id === existed.userId) {
+          const item = await this.databaseService.cart.update({
+            where: {
+              userId_productId: {
+                userId: userId,
+                productId: productId
+              }
+            },
+            data: {
+              quantity: updateCartDto.quantity
+            }
+          });
+
+          return {
+            item,
+            err: null
+          }
+        } else {
+          return {
+            item: null,
+            err: "you are not authorized to access this cart item"
+          }
+        }
+      }
+    } catch (err) {
+      console.log("Error: ", err)
+      return {
+        item: null,
+        err: err.message
+      }
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} cart`;
+  async DeleteCartItemById(productId: number, userId: number, req: Request): Promise<{ err: string }> {
+    try {
+      const existed = await this.databaseService.cart.findFirst({
+        where: {
+          productId,
+          userId
+        }
+      })
+
+      // role: admin
+      if (req['user'].roleId === 1) {
+        if (!existed) {
+          return {
+            err: "not found this cart item"
+          }
+        }
+
+        await this.databaseService.cart.delete({
+          where: {
+            userId_productId: {
+              userId,
+              productId
+            }
+          }
+        })
+
+        return {
+          err: null
+        }
+      }
+      // role: customer
+      else if (req['user'].roleId === 2) {
+        // ownership validation
+        if (existed && req['user'].id === existed.userId) {
+          await this.databaseService.cart.delete({
+            where: {
+              userId_productId: {
+                userId,
+                productId
+              }
+            }
+          })
+
+          return {
+            err: null
+          }
+        } else {
+          return {
+            err: "you are not authorized to access this cart item"
+          }
+        }
+      }
+    } catch (err) {
+      console.log("Error: ", err)
+      return {
+        err: err.message
+      }
+    }
   }
 }
