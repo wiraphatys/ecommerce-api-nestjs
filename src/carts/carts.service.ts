@@ -199,7 +199,63 @@ export class CartsService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} cart`;
+  async DeleteCartItemById(productId: number, userId: number, req: Request): Promise<{ err: string }> {
+    try {
+      const existed = await this.databaseService.cart.findFirst({
+        where: {
+          productId,
+          userId
+        }
+      })
+
+      // role: admin
+      if (req['user'].roleId === 1) {
+        if (!existed) {
+          return {
+            err: "not found this cart item"
+          }
+        }
+
+        await this.databaseService.cart.delete({
+          where: {
+            userId_productId: {
+              userId,
+              productId
+            }
+          }
+        })
+
+        return {
+          err: null
+        }
+      }
+      // role: customer
+      else if (req['user'].roleId === 2) {
+        // ownership validation
+        if (existed && req['user'].id === existed.userId) {
+          await this.databaseService.cart.delete({
+            where: {
+              userId_productId: {
+                userId,
+                productId
+              }
+            }
+          })
+
+          return {
+            err: null
+          }
+        } else {
+          return {
+            err: "you are not authorized to access this cart item"
+          }
+        }
+      }
+    } catch (err) {
+      console.log("Error: ", err)
+      return {
+        err: err.message
+      }
+    }
   }
 }

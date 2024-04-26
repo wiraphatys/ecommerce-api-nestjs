@@ -174,8 +174,53 @@ export class CartsController {
     })
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cartsService.remove(+id);
+  @Delete(':productId')
+  async DeleteCartItemById(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Param('productId') productId: string,
+    @Query('uid') uid: string
+  ) {
+    let userId: number;
+    let statusCode = 400;
+
+    const userRole = req['user'].roleId;
+    switch (userRole) {
+      case 1:
+        if (uid === undefined) {
+          return res.status(statusCode).json({ success: false, message: "query params uid cannot be null" })
+        }
+        userId = +uid;
+        break;
+      case 2:
+        userId = req['user'].id
+        break;
+      default:
+        return res.status(statusCode).json({ success: false, message: "invalid user role" })
+
+    }
+    const { err } = await this.cartsService.DeleteCartItemById(+productId, userId, req)
+    if (err !== null) {
+      switch (err) {
+        case "not found this cart item":
+          statusCode = 404
+          break
+        case "you are not authorized to access this cart item":
+          statusCode = 401
+          break
+        default:
+          statusCode = 500
+      }
+
+      return res.status(statusCode).json({
+        success: false,
+        message: err
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {}
+    })
   }
 }
