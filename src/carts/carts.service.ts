@@ -128,8 +128,75 @@ export class CartsService {
     }
   }
 
-  update(id: number, updateCartDto: UpdateCartDto) {
-    return `This action updates a #${id} cart`;
+  async UpdateCartItemById(productId: number, userId: number, req: Request, updateCartDto: UpdateCartDto): Promise<{ item: Cart, err: string }> {
+    try {
+      const existed = await this.databaseService.cart.findFirst({
+        where: {
+          productId,
+          userId
+        }
+      })
+
+      // role: admin
+      if (req['user'].roleId === 1) {
+        if (!existed) {
+          return {
+            item: null,
+            err: "not found this cart item"
+          }
+        }
+
+        const item = await this.databaseService.cart.update({
+          where: {
+            userId_productId: {
+              userId: userId,
+              productId: productId
+            }
+          },
+          data: {
+            quantity: updateCartDto.quantity
+          }
+        });
+
+        return {
+          item,
+          err: null
+        }
+      } 
+      // role: customer
+      else if (req['user'].roleId === 2) {
+        // ownership validation
+        if (existed && req['user'].id === existed.userId) {
+          const item = await this.databaseService.cart.update({
+            where: {
+              userId_productId: {
+                userId: userId,
+                productId: productId
+              }
+            },
+            data: {
+              quantity: updateCartDto.quantity
+            }
+          });
+
+          return {
+            item,
+            err: null
+          }
+        } else {
+          return {
+            item: null,
+            err: "you are not authorized to access this cart item"
+          }
+        }
+      }
+    } catch (err) {
+      console.log("Error: ", err)
+      return {
+        item: null,
+        err: err.message
+      }
+    }
   }
 
   remove(id: number) {

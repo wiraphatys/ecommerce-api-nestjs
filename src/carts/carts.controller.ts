@@ -87,7 +87,7 @@ export class CartsController {
     switch (userRole) {
       case 1:
         if (uid === undefined) {
-          break;
+          return res.status(statusCode).json({ success: false, message: "query params uid cannot be null" })
         }
         userId = +uid;
         break;
@@ -123,9 +123,55 @@ export class CartsController {
     })
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCartDto: UpdateCartDto) {
-    return this.cartsService.update(+id, updateCartDto);
+  @Patch(':productId')
+  async UpdateCartItemById(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Param('productId') productId: string,
+    @Query('uid') uid: string, 
+    @Body() updateCartDto: UpdateCartDto
+  ) {
+    let userId: number;
+    let statusCode = 400;
+
+    const userRole = req['user'].roleId;
+    switch (userRole) {
+      case 1:
+        if (uid === undefined) {
+          return res.status(statusCode).json({ success: false, message: "query params uid cannot be null" })
+        }
+        userId = +uid;
+        break;
+      case 2:
+        userId = req['user'].id
+        break;
+      default:
+        return res.status(statusCode).json({ success: false, message: "invalid user role" })
+
+    }
+    const { item, err } = await this.cartsService.UpdateCartItemById(+productId, userId, req, updateCartDto)
+    if (err !== null) {
+      switch (err) {
+        case "not found this cart item":
+          statusCode = 404
+          break
+        case "you are not authorized to access this cart item":
+          statusCode = 401
+          break
+        default:
+          statusCode = 500
+      }
+
+      return res.status(statusCode).json({
+        success: false,
+        message: err
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: item
+    })
   }
 
   @Delete(':id')

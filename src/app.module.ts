@@ -58,7 +58,8 @@ export class AppModule implements NestModule {
 
           // carts
           { path: "carts", method: RequestMethod.GET },
-          { path: "carts/:productId", method: RequestMethod.GET }
+          { path: "carts/:productId", method: RequestMethod.GET },
+          { path: "carts/:productId", method: RequestMethod.PATCH },
           
         )
         .apply(Authenticated, AuthorizeAdmin)
